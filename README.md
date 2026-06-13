@@ -124,6 +124,10 @@ It includes:
 
 Open the generated page in your browser, then upload a trace or use one of the sample files.
 
+Preview:
+
+![AgentTrace UI preview](/Users/mnarasimhan/Documents/Codex/2026-06-12/files-mentioned-by-the-user-agenttrace/outputs/agenttrace-ui-preview.png)
+
 ## Troubleshooting
 
 - `command not found: agenttrace`
@@ -157,4 +161,3 @@ Minimal example:
   ]
 }
 ```
-

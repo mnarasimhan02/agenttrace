@@ -8,7 +8,7 @@ class TraceParseError(ValueError):
     """Raised when a trace file cannot be normalized into AgentTrace models."""
 
 
-@dataclass(slots=True)
+@dataclass
 class Step:
     step_id: int | None = None
     type: str = "tool"
@@ -17,7 +17,7 @@ class Step:
     status: str | None = None
 
 
-@dataclass(slots=True)
+@dataclass
 class Trace:
     steps: list[Step] = field(default_factory=list)
 
@@ -77,7 +77,7 @@ class Trace:
         return cls.from_dict({"steps": raw_steps})
 
 
-@dataclass(slots=True)
+@dataclass
 class Issue:
     kind: str
     title: str
@@ -86,7 +86,7 @@ class Issue:
     recommendation: str | None = None
 
 
-@dataclass(slots=True)
+@dataclass
 class AnalysisResult:
     reliability_score: int
     total_tokens: int

@@ -1,7 +1,7 @@
 __pycache__/
 *.pyc
+*.egg-info/
 agenttrace-ui.html
 outputs/*.html
 outputs/*.md
 work/
-

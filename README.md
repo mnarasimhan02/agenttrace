@@ -2,6 +2,20 @@
 
 AgentTrace is an offline analyzer for AI agent execution traces.
 
+It reads a trace file, looks for failure patterns, and shows where an agent may be wasting time or repeating itself.
+
+## Start Here
+
+If you just want to try it quickly:
+
+```bash
+cd /path/to/agenttrace
+python3 -m pip install --no-build-isolation -e .
+agenttrace ui --serve
+```
+
+Then open the local link that appears in your browser or terminal.
+
 It helps you spot common failure patterns in agent runs, including:
 
 - repeated tool calls
@@ -27,7 +41,7 @@ AgentTrace turns those symptoms into a readable report with a reliability score 
 
 ## Installation
 
-### Option 1: Install from source
+### Install from source
 
 ```bash
 git clone <your-repo-url>
@@ -35,7 +49,7 @@ cd agenttrace
 python3 -m pip install --no-build-isolation -e .
 ```
 
-### Option 2: Install into an existing environment
+### Install into an existing environment
 
 ```bash
 python3 -m pip install --no-build-isolation -e /path/to/agenttrace
@@ -117,6 +131,7 @@ Expected result:
 - reliability score stays high
 - no issues are reported
 - estimated waste is near zero
+- the UI should show a clean run with no major warnings
 
 ### `sample_traces/looping.big.json`
 
@@ -131,6 +146,7 @@ Expected result:
 - tool repetition is flagged
 - the reliability score drops
 - waste is estimated from repeated calls
+- the UI should show repeated-tool warnings
 
 ### `sample_traces/retry_storm.big.json`
 
@@ -145,6 +161,7 @@ Expected result:
 - retry storm is flagged
 - severity increases with repeated failures
 - waste is estimated from failed attempts
+- the UI should show retry-related warnings
 
 ### Larger samples
 
@@ -160,15 +177,17 @@ The browser UI includes quick-load buttons for these bundled samples.
 
 ## Browser UI
 
-The interactive UI is intentionally simple.
+The interactive UI is intentionally simple and uses a single page layout.
 
 It includes:
 
-- a single file upload button
-- three quick sample buttons
-- reliability and waste summary cards
-- issues and recommendations panels
-- a preview of the parsed trace
+- one upload button for `.json` trace files
+- three quick sample buttons for the bundled traces
+- a summary of reliability and waste
+- detected issues and recommendations
+- a preview of the parsed trace data
+
+When you run the UI locally, open the generated page in your browser and upload a sample or your own trace file.
 
 ### Local server mode
 
@@ -310,13 +329,14 @@ agenttrace analyze sample_traces/retry_storm.big.json --html report.html
 agenttrace/
 ├── app.py
 ├── analyzer.py
-├── detectors/
-├── models/
-├── reports/
+├── __main__.py
+├── __init__.py
 sample_traces/
 tests/
+outputs/
 README.md
-pyproject.toml
+setup.py
+pytest.ini
 ```
 
 ## Development
@@ -330,6 +350,22 @@ python -m agenttrace analyze sample_traces/healthy.big.json
 python -m agenttrace analyze sample_traces/looping.big.json --report report.md
 python -m agenttrace analyze sample_traces/retry_storm.big.json --html report.html
 ```
+
+## Troubleshooting
+
+If something does not work, these are the most common fixes:
+
+- `command not found: agenttrace`
+  - Re-run the install command from inside the repo folder.
+  - If needed, use `python3 -m agenttrace ...` instead of `agenttrace ...`.
+- `pip` tries to build extra tools
+  - Use `--no-build-isolation` exactly as shown in the install commands.
+- The UI opens but looks empty
+  - Reload the page and try one of the bundled sample files.
+  - Make sure you are uploading a `.json` trace file.
+- The file is large and slow to load
+  - That is expected for big traces.
+  - Wait for the analysis to finish before opening another file.
 
 ## Roadmap
 

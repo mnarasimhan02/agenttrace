@@ -12,7 +12,7 @@ It helps you spot common failure patterns in agent runs, including:
 
 The tool runs locally, requires no LLM calls, and is designed for agent traces captured from frameworks such as OpenAI Agents SDK, LangGraph, CrewAI, AutoGen, or custom workflows.
 
-It can handle long traces, and JSONL or log-style input is usually the best fit for very large runs.
+It can handle long traces, and plain JSON files are the simplest way to use it.
 
 ## Why use it
 
@@ -83,7 +83,7 @@ python -m agenttrace analyze trace.json
 If you want to test without installing first, this works too:
 
 ```bash
-PYTHONPATH=. python3 -m agenttrace analyze sample_traces/healthy.big.jsonl
+PYTHONPATH=. python3 -m agenttrace analyze sample_traces/healthy.big.json
 ```
 
 To open the browser UI:
@@ -95,7 +95,7 @@ agenttrace ui --serve
 Or generate a standalone HTML file:
 
 ```bash
-agenttrace ui --output agenttrace-ui.html
+agenttrace ui --output outputs/agenttrace-ui.html
 ```
 
 ## Included Sample Files
@@ -104,14 +104,12 @@ The repository includes sample traces in `sample_traces/` so you can try the too
 
 The examples are intentionally sized to feel more like real traces, not just toy fixtures.
 
-### `sample_traces/healthy.json`
+### `sample_traces/healthy.big.json`
 
-A simple trace with normal progression and no major issues.
-
-Use it to see the baseline output:
+Use the larger JSON sample instead:
 
 ```bash
-agenttrace analyze sample_traces/healthy.json
+agenttrace analyze sample_traces/healthy.big.json
 ```
 
 Expected result:
@@ -120,20 +118,12 @@ Expected result:
 - no issues are reported
 - estimated waste is near zero
 
-You can also run the JSONL version:
-
-```bash
-agenttrace analyze sample_traces/healthy.jsonl
-```
-
-### `sample_traces/looping.json`
-
-A trace that repeats the same tool many times.
+### `sample_traces/looping.big.json`
 
 Use it to verify tool repetition detection:
 
 ```bash
-agenttrace analyze sample_traces/looping.json
+agenttrace analyze sample_traces/looping.big.json
 ```
 
 Expected result:
@@ -142,20 +132,12 @@ Expected result:
 - the reliability score drops
 - waste is estimated from repeated calls
 
-You can also run the JSONL version:
-
-```bash
-agenttrace analyze sample_traces/looping.jsonl
-```
-
-### `sample_traces/retry_storm.json`
-
-A trace with repeated failures and retries.
+### `sample_traces/retry_storm.big.json`
 
 Use it to verify retry storm detection:
 
 ```bash
-agenttrace analyze sample_traces/retry_storm.json
+agenttrace analyze sample_traces/retry_storm.big.json
 ```
 
 Expected result:
@@ -164,19 +146,13 @@ Expected result:
 - severity increases with repeated failures
 - waste is estimated from failed attempts
 
-You can also run the JSONL version:
-
-```bash
-agenttrace analyze sample_traces/retry_storm.jsonl
-```
-
 ### Larger samples
 
 If you want to try longer files right away, use these bigger examples:
 
-- `sample_traces/healthy.big.jsonl`
-- `sample_traces/looping.big.jsonl`
-- `sample_traces/retry_storm.big.jsonl`
+- `sample_traces/healthy.big.json`
+- `sample_traces/looping.big.json`
+- `sample_traces/retry_storm.big.json`
 
 These are much larger files, closer to the kind of trace data AgentTrace is meant to handle in practice.
 
@@ -218,23 +194,16 @@ agenttrace ui --serve --host 0.0.0.0 --port 9000
 If you just want a file you can keep or share locally:
 
 ```bash
-agenttrace ui --output agenttrace-ui.html
+agenttrace ui --output outputs/agenttrace-ui.html
 ```
 
 ## Input Format
 
-AgentTrace automatically detects the input format.
+AgentTrace expects a JSON object with a `steps` array.
 
 Recommended format:
 
 - JSON object with a `steps` array
-
-It can also read:
-
-- a JSON array of step objects
-- JSONL-style log files with one JSON step per line
-- log files with extra text around embedded JSON objects
-- large traces with thousands of steps
 
 Minimal example:
 
@@ -268,51 +237,6 @@ Missing fields are handled gracefully:
 - missing `name` values do not crash the analyzer
 - missing `tokens` values default to `0`
 - missing `status` values are treated as non-failures
-
-### Log files
-
-If your agent writes trace entries to a `.log`, `.txt`, or `.jsonl` file, AgentTrace can still read it as long as each line is valid JSON.
-
-Example JSONL trace:
-
-```text
-{"step_id": 1, "type": "tool", "name": "search", "tokens": 200, "status": "success"}
-{"step_id": 2, "type": "tool", "name": "summarize", "tokens": 120, "status": "success"}
-{"step_id": 3, "type": "tool", "name": "answer", "tokens": 80, "status": "success"}
-```
-
-If the log line contains extra text around the JSON object, AgentTrace will try to extract the JSON portion first.
-
-For very large traces, JSONL is the safest format because AgentTrace can process it line by line without needing to reshape the whole file first.
-
-## Sample Log Files
-
-The repository also includes JSONL-formatted log examples:
-
-- `sample_traces/healthy.jsonl`
-- `sample_traces/looping.jsonl`
-- `sample_traces/retry_storm.jsonl`
-
-Try them like this:
-
-```bash
-agenttrace analyze sample_traces/healthy.jsonl
-agenttrace analyze sample_traces/looping.jsonl
-agenttrace analyze sample_traces/retry_storm.jsonl
-```
-
-## Large Traces
-
-For long production runs, prefer `.jsonl` or `.log` files with one JSON object per line.
-
-That format is the most convenient for:
-
-- huge traces
-- live logs
-- partial exports
-- traces that are written incrementally
-
-Plain JSON files are still supported, but JSONL is generally the most robust option when traces get large.
 
 ## Output
 
@@ -365,19 +289,19 @@ The HTML report is meant for quick sharing or browser viewing and includes:
 Analyze a healthy trace:
 
 ```bash
-agenttrace analyze sample_traces/healthy.json
+agenttrace analyze sample_traces/healthy.big.json
 ```
 
 Analyze a looping trace and write a Markdown report:
 
 ```bash
-agenttrace analyze sample_traces/looping.json --report report.md
+agenttrace analyze sample_traces/looping.big.json --report report.md
 ```
 
 Analyze a retry storm trace and write HTML output:
 
 ```bash
-agenttrace analyze sample_traces/retry_storm.json --html report.html
+agenttrace analyze sample_traces/retry_storm.big.json --html report.html
 ```
 
 ## Project Structure
@@ -402,9 +326,9 @@ Run the code formatter or tests from your local environment as needed.
 If you want to verify the package manually, these commands are a good starting point:
 
 ```bash
-python -m agenttrace analyze sample_traces/healthy.json
-python -m agenttrace analyze sample_traces/looping.json --report report.md
-python -m agenttrace analyze sample_traces/retry_storm.json --html report.html
+python -m agenttrace analyze sample_traces/healthy.big.json
+python -m agenttrace analyze sample_traces/looping.big.json --report report.md
+python -m agenttrace analyze sample_traces/retry_storm.big.json --html report.html
 ```
 
 ## Roadmap

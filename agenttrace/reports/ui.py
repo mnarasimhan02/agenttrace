@@ -5,9 +5,9 @@ from pathlib import Path
 
 
 SAMPLE_FILES = {
-    "Healthy": "sample_traces/healthy.big.jsonl",
-    "Looping": "sample_traces/looping.big.jsonl",
-    "Retry Storm": "sample_traces/retry_storm.big.jsonl",
+    "Healthy": "sample_traces/healthy.big.json",
+    "Looping": "sample_traces/looping.big.json",
+    "Retry Storm": "sample_traces/retry_storm.big.json",
 }
 
 
@@ -135,14 +135,14 @@ def render_ui_html() -> str:
   <main class="wrap">
     <section class="hero">
       <h1>AgentTrace</h1>
-      <p class="lede">Upload a trace or use one of the bundled examples. The page reads JSON, JSONL, and log-style files, then shows a compact analysis right away.</p>
+      <p class="lede">Upload a trace or use one of the bundled examples. The page reads plain JSON trace files and shows a compact analysis right away.</p>
     </section>
 
     <section class="card">
       <h2 class="section-title">Open a trace</h2>
       <div class="controls">
         <label class="button" for="file">Choose File</label>
-        <input id="file" type="file" accept=".json,.jsonl,.log,.txt">
+        <input id="file" type="file" accept=".json">
         <span class="muted">or pick a sample:</span>
         <button class="sample" data-sample="Healthy">Healthy</button>
         <button class="sample" data-sample="Looping">Looping</button>
@@ -191,31 +191,10 @@ def render_ui_html() -> str:
         try {{
           return JSON.parse(text);
         }} catch (err) {{
-          return parseJsonLines(text);
+          throw new Error('Unable to parse JSON trace.');
         }}
       }}
-      return parseJsonLines(text);
-    }}
-
-    function parseJsonLines(text) {{
-      const steps = [];
-      for (const line of text.split(/\\r?\\n/)) {{
-        const trimmed = line.trim();
-        if (!trimmed) continue;
-        try {{
-          steps.push(JSON.parse(trimmed));
-          continue;
-        }} catch (err) {{
-          const match = trimmed.match(/\\{{.*\\}}/);
-          if (match) {{
-            steps.push(JSON.parse(match[0]));
-            continue;
-          }}
-          throw new Error('Unable to parse a log line as JSON.');
-        }}
-      }}
-      if (!steps.length) throw new Error('No usable JSON records found.');
-      return {{ steps }};
+      throw new Error('Trace must be a JSON array or a JSON object with a steps array.');
     }}
 
     function normalizeTrace(payload) {{

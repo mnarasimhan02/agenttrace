@@ -1,6 +1,0 @@
-{"step_id": 1, "type": "tool", "name": "search", "tokens": 80, "status": "error"}
-{"step_id": 2, "type": "tool", "name": "search", "tokens": 85, "status": "error"}
-{"step_id": 3, "type": "tool", "name": "search", "tokens": 90, "status": "error"}
-{"step_id": 4, "type": "tool", "name": "search", "tokens": 95, "status": "error"}
-{"step_id": 5, "type": "tool", "name": "search", "tokens": 100, "status": "error"}
-

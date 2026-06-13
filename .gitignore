@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+agenttrace-ui.html
+outputs/*.html
+outputs/*.md
+work/
+

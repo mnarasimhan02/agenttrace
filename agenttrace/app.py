@@ -88,7 +88,7 @@ def build_parser() -> argparse.ArgumentParser:
     analyze_parser.add_argument("--report", type=Path, help="Write a markdown report.")
     analyze_parser.add_argument("--html", type=Path, help="Write an HTML report.")
     ui_parser = subparsers.add_parser("ui", help="Write a standalone interactive HTML UI.")
-    ui_parser.add_argument("--output", type=Path, default=Path("agenttrace-ui.html"), help="HTML output file.")
+    ui_parser.add_argument("--output", type=Path, default=Path("outputs/agenttrace-ui.html"), help="HTML output file.")
     ui_parser.add_argument("--serve", action="store_true", help="Serve the UI on a local web server.")
     ui_parser.add_argument("--host", default="127.0.0.1", help="Host to bind when serving the UI.")
     ui_parser.add_argument("--port", type=int, default=8765, help="Port to bind when serving the UI.")
@@ -103,6 +103,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.serve:
                 _serve_ui(args.host, args.port)
             else:
+                args.output.parent.mkdir(parents=True, exist_ok=True)
                 args.output.write_text(render_ui_html())
                 print(f"Wrote interactive UI to {args.output}")
             return 0

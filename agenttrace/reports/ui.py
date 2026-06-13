@@ -515,12 +515,17 @@ def render_ui_html() -> str:
         await analyzeText(await file.text(), file.name);
       }} catch (err) {{
         statusEl.textContent = err.message || String(err);
+        fileNameEl.textContent = `Loaded: ${{file.name}}`;
       }}
     }}
 
     fileInput.addEventListener('change', event => {{
       const file = event.target.files && event.target.files[0];
-      if (file) handleFile(file);
+      if (file) {{
+        handleFile(file).catch(err => {{
+          statusEl.textContent = err.message || String(err);
+        }});
+      }}
     }});
 
     drop.addEventListener('dragover', event => {{
@@ -532,7 +537,11 @@ def render_ui_html() -> str:
       event.preventDefault();
       drop.classList.remove('drag');
       const file = event.dataTransfer.files && event.dataTransfer.files[0];
-      if (file) handleFile(file);
+      if (file) {{
+        handleFile(file).catch(err => {{
+          statusEl.textContent = err.message || String(err);
+        }});
+      }}
     }});
 
     clearLink.addEventListener('click', event => {{
@@ -552,7 +561,9 @@ def render_ui_html() -> str:
     for (const [label, text] of Object.entries(SAMPLE_DATA)) {{
       const btn = document.createElement('button');
       btn.textContent = label;
-      btn.addEventListener('click', () => analyzeText(text, `${{label}} sample`));
+      btn.addEventListener('click', () => analyzeText(text, `${{label}} sample`).catch(err => {{
+        statusEl.textContent = err.message || String(err);
+      }}));
       sampleGrid.appendChild(btn);
     }}
   </script>

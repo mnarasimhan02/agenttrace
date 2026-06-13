@@ -1,0 +1,4 @@
+{"step_id": 1, "type": "tool", "name": "search", "tokens": 100, "status": "success"}
+{"step_id": 2, "type": "tool", "name": "summarize", "tokens": 120, "status": "success"}
+{"step_id": 3, "type": "tool", "name": "answer", "tokens": 140, "status": "success"}
+

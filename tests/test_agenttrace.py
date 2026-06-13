@@ -1,7 +1,9 @@
 from pathlib import Path
 import json
+import tempfile
 
 from agenttrace.analyzer import analyze_trace
+from agenttrace.app import load_trace
 from agenttrace.models.trace import Trace, TraceParseError
 
 
@@ -62,3 +64,54 @@ def test_invalid_step_object_raises_clear_error():
         assert "Step 1" in str(exc)
     else:
         raise AssertionError("expected TraceParseError")
+
+
+def test_load_trace_accepts_json_array():
+    with tempfile.NamedTemporaryFile("w+", suffix=".json", delete=True) as handle:
+        json.dump(
+            [
+                {"step_id": 1, "type": "tool", "name": "search", "tokens": 10, "status": "success"},
+                {"step_id": 2, "type": "tool", "name": "answer", "tokens": 20, "status": "success"},
+            ],
+            handle,
+        )
+        handle.flush()
+        trace = load_trace(Path(handle.name))
+    assert len(trace.steps) == 2
+
+
+def test_load_trace_accepts_jsonl_log_file():
+    with tempfile.NamedTemporaryFile("w+", suffix=".log", delete=True) as handle:
+        handle.write('{"step_id": 1, "type": "tool", "name": "search", "tokens": 10, "status": "success"}\n')
+        handle.write('{"step_id": 2, "type": "tool", "name": "search", "tokens": 10, "status": "success"}\n')
+        handle.flush()
+        trace = load_trace(Path(handle.name))
+    assert len(trace.steps) == 2
+
+
+def test_load_trace_accepts_noisy_log_lines():
+    with tempfile.NamedTemporaryFile("w+", suffix=".log", delete=True) as handle:
+        handle.write('2026-06-12T10:00:00Z INFO step={"step_id": 1, "type": "tool", "name": "search", "tokens": 10, "status": "success"}\n')
+        handle.write('2026-06-12T10:00:01Z INFO step={"step_id": 2, "type": "tool", "name": "search", "tokens": 10, "status": "success"}\n')
+        handle.flush()
+        trace = load_trace(Path(handle.name))
+    assert len(trace.steps) == 2
+
+
+def test_load_trace_accepts_large_jsonl_trace():
+    with tempfile.NamedTemporaryFile("w+", suffix=".jsonl", delete=True) as handle:
+        for i in range(10_000):
+            json.dump(
+                {
+                    "step_id": i + 1,
+                    "type": "tool",
+                    "name": "search" if i % 2 == 0 else "answer",
+                    "tokens": 1,
+                    "status": "success",
+                },
+                handle,
+            )
+            handle.write("\n")
+        handle.flush()
+        trace = load_trace(Path(handle.name))
+    assert len(trace.steps) == 10_000

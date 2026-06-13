@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 
 from agenttrace.analyzer import analyze_trace
@@ -12,15 +13,67 @@ from agenttrace.reports.markdown import render_markdown_report
 
 def load_trace(path: Path) -> Trace:
     try:
-        payload = json.loads(path.read_text())
-    except json.JSONDecodeError as exc:
-        raise ValueError(f"Invalid JSON in {path}: {exc.msg}") from exc
+        with path.open("r", encoding="utf-8") as handle:
+            first_non_whitespace = _peek_first_non_whitespace(handle)
+            handle.seek(0)
+            if first_non_whitespace == "[":
+                payload = json.load(handle)
+                return Trace.from_steps(payload)
+            if first_non_whitespace == "{":
+                try:
+                    payload = json.load(handle)
+                    return Trace.from_dict(payload)
+                except json.JSONDecodeError:
+                    handle.seek(0)
+                    payload = _parse_log_stream(handle, path)
+            else:
+                payload = _parse_log_stream(handle, path)
     except OSError as exc:
         raise ValueError(f"Unable to read {path}: {exc.strerror}") from exc
+
     try:
         return Trace.from_dict(payload)
     except TraceParseError as exc:
         raise ValueError(str(exc)) from exc
+
+
+def _peek_first_non_whitespace(handle) -> str | None:
+    while True:
+        chunk = handle.read(4096)
+        if not chunk:
+            return None
+        for char in chunk:
+            if not char.isspace():
+                return char
+
+
+def _parse_log_stream(handle, path: Path) -> dict[str, object]:
+    steps: list[object] = []
+    json_candidate_pattern = re.compile(r"\{.*\}")
+    saw_content = False
+    for line_number, line in enumerate(handle, start=1):
+        line = line.strip()
+        if not line:
+            continue
+        saw_content = True
+        try:
+            steps.append(json.loads(line))
+        except json.JSONDecodeError as exc:
+            candidate = json_candidate_pattern.search(line)
+            if candidate:
+                try:
+                    steps.append(json.loads(candidate.group(0)))
+                    continue
+                except json.JSONDecodeError:
+                    pass
+            raise ValueError(
+                f"Unable to parse {path} as JSON or JSONL; line {line_number} is not valid JSON: {exc.msg}"
+            ) from exc
+    if not steps:
+        if saw_content:
+            raise ValueError(f"Unable to parse trace file {path}: no usable JSON records found.")
+        raise ValueError(f"Trace file is empty: {path}")
+    return {"steps": steps}
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -50,5 +103,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.html:
         args.html.write_text(render_html_report(result))
     return 0
+
+
 if __name__ == "__main__":
     raise SystemExit(main())

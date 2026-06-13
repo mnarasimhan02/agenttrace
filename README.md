@@ -12,6 +12,8 @@ It helps you spot common failure patterns in agent runs, including:
 
 The tool runs locally, requires no LLM calls, and is designed for agent traces captured from frameworks such as OpenAI Agents SDK, LangGraph, CrewAI, AutoGen, or custom workflows.
 
+It can handle long traces, and JSONL or log-style input is usually the best fit for very large runs.
+
 ## Why use it
 
 When an agent gets stuck, the symptoms are usually visible in the trace:
@@ -97,6 +99,12 @@ Expected result:
 - no issues are reported
 - estimated waste is near zero
 
+You can also run the JSONL version:
+
+```bash
+agenttrace analyze sample_traces/healthy.jsonl
+```
+
 ### `sample_traces/looping.json`
 
 A trace that repeats the same tool many times.
@@ -112,6 +120,12 @@ Expected result:
 - tool repetition is flagged
 - the reliability score drops
 - waste is estimated from repeated calls
+
+You can also run the JSONL version:
+
+```bash
+agenttrace analyze sample_traces/looping.jsonl
+```
 
 ### `sample_traces/retry_storm.json`
 
@@ -129,9 +143,26 @@ Expected result:
 - severity increases with repeated failures
 - waste is estimated from failed attempts
 
+You can also run the JSONL version:
+
+```bash
+agenttrace analyze sample_traces/retry_storm.jsonl
+```
+
 ## Input Format
 
-AgentTrace expects a JSON object with a `steps` array.
+AgentTrace automatically detects the input format.
+
+Recommended format:
+
+- JSON object with a `steps` array
+
+It can also read:
+
+- a JSON array of step objects
+- JSONL-style log files with one JSON step per line
+- log files with extra text around embedded JSON objects
+- large traces with thousands of steps
 
 Minimal example:
 
@@ -165,6 +196,51 @@ Missing fields are handled gracefully:
 - missing `name` values do not crash the analyzer
 - missing `tokens` values default to `0`
 - missing `status` values are treated as non-failures
+
+### Log files
+
+If your agent writes trace entries to a `.log`, `.txt`, or `.jsonl` file, AgentTrace can still read it as long as each line is valid JSON.
+
+Example JSONL trace:
+
+```text
+{"step_id": 1, "type": "tool", "name": "search", "tokens": 200, "status": "success"}
+{"step_id": 2, "type": "tool", "name": "summarize", "tokens": 120, "status": "success"}
+{"step_id": 3, "type": "tool", "name": "answer", "tokens": 80, "status": "success"}
+```
+
+If the log line contains extra text around the JSON object, AgentTrace will try to extract the JSON portion first.
+
+For very large traces, JSONL is the safest format because AgentTrace can process it line by line without needing to reshape the whole file first.
+
+## Sample Log Files
+
+The repository also includes JSONL-formatted log examples:
+
+- `sample_traces/healthy.jsonl`
+- `sample_traces/looping.jsonl`
+- `sample_traces/retry_storm.jsonl`
+
+Try them like this:
+
+```bash
+agenttrace analyze sample_traces/healthy.jsonl
+agenttrace analyze sample_traces/looping.jsonl
+agenttrace analyze sample_traces/retry_storm.jsonl
+```
+
+## Large Traces
+
+For long production runs, prefer `.jsonl` or `.log` files with one JSON object per line.
+
+That format is the most convenient for:
+
+- huge traces
+- live logs
+- partial exports
+- traces that are written incrementally
+
+Plain JSON files are still supported, but JSONL is generally the most robust option when traces get large.
 
 ## Output
 

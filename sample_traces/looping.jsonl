@@ -1,0 +1,6 @@
+{"step_id": 1, "type": "tool", "name": "search", "tokens": 100, "status": "success"}
+{"step_id": 2, "type": "tool", "name": "search", "tokens": 150, "status": "success"}
+{"step_id": 3, "type": "tool", "name": "search", "tokens": 200, "status": "success"}
+{"step_id": 4, "type": "tool", "name": "search", "tokens": 250, "status": "success"}
+{"step_id": 5, "type": "tool", "name": "search", "tokens": 300, "status": "success"}
+

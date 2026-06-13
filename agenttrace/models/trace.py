@@ -72,6 +72,10 @@ class Trace:
             )
         return cls(steps=steps)
 
+    @classmethod
+    def from_steps(cls, raw_steps: list[Any]) -> "Trace":
+        return cls.from_dict({"steps": raw_steps})
+
 
 @dataclass(slots=True)
 class Issue:

@@ -32,13 +32,13 @@ AgentTrace turns those symptoms into a readable report with a reliability score 
 ```bash
 git clone <your-repo-url>
 cd agenttrace
-pip install -e .
+python3 -m pip install --no-build-isolation -e .
 ```
 
 ### Option 2: Install into an existing environment
 
 ```bash
-pip install -e /path/to/agenttrace
+python3 -m pip install --no-build-isolation -e /path/to/agenttrace
 ```
 
 ### Requirements
@@ -46,6 +46,7 @@ pip install -e /path/to/agenttrace
 - Python 3.11 or newer
 - No API keys
 - No network access required after installation
+- If `pip install -e .` tries to fetch build tools, add `--no-build-isolation`
 
 ## Quick Start
 
@@ -77,6 +78,12 @@ You can also run it as a module:
 
 ```bash
 python -m agenttrace analyze trace.json
+```
+
+If you want to test without installing first, this works too:
+
+```bash
+PYTHONPATH=. python3 -m agenttrace analyze sample_traces/healthy.big.jsonl
 ```
 
 To open the browser UI:
@@ -169,19 +176,20 @@ If you want to try longer files right away, use these bigger examples:
 
 - `sample_traces/healthy.big.jsonl`
 - `sample_traces/looping.big.jsonl`
+- `sample_traces/retry_storm.big.jsonl`
 
-They are still easy to read, but they better reflect the kind of input AgentTrace is meant to handle in practice.
+These are much larger files, closer to the kind of trace data AgentTrace is meant to handle in practice.
 
-The browser UI also includes quick-load buttons for these bundled samples.
+The browser UI includes quick-load buttons for these bundled samples.
 
 ## Browser UI
 
-The interactive UI lets you upload a trace directly in the browser and review the analysis in place.
+The interactive UI is intentionally simple.
 
 It includes:
 
-- file upload and drag-and-drop
-- quick sample buttons
+- a single file upload button
+- three quick sample buttons
 - reliability and waste summary cards
 - issues and recommendations panels
 - a preview of the parsed trace

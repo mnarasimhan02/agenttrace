@@ -3,12 +3,16 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import threading
+import webbrowser
 from pathlib import Path
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from agenttrace.analyzer import analyze_trace
 from agenttrace.models.trace import Trace, TraceParseError
 from agenttrace.reports.html import render_html_report
 from agenttrace.reports.markdown import render_markdown_report
+from agenttrace.reports.ui import render_ui_html
 
 
 def load_trace(path: Path) -> Trace:
@@ -83,6 +87,11 @@ def build_parser() -> argparse.ArgumentParser:
     analyze_parser.add_argument("trace", type=Path)
     analyze_parser.add_argument("--report", type=Path, help="Write a markdown report.")
     analyze_parser.add_argument("--html", type=Path, help="Write an HTML report.")
+    ui_parser = subparsers.add_parser("ui", help="Write a standalone interactive HTML UI.")
+    ui_parser.add_argument("--output", type=Path, default=Path("agenttrace-ui.html"), help="HTML output file.")
+    ui_parser.add_argument("--serve", action="store_true", help="Serve the UI on a local web server.")
+    ui_parser.add_argument("--host", default="127.0.0.1", help="Host to bind when serving the UI.")
+    ui_parser.add_argument("--port", type=int, default=8765, help="Port to bind when serving the UI.")
     return parser
 
 
@@ -90,6 +99,13 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     if args.command != "analyze":
+        if args.command == "ui":
+            if args.serve:
+                _serve_ui(args.host, args.port)
+            else:
+                args.output.write_text(render_ui_html())
+                print(f"Wrote interactive UI to {args.output}")
+            return 0
         parser.error("Unknown command")
 
     result = analyze_trace(load_trace(args.trace))
@@ -103,6 +119,35 @@ def main(argv: list[str] | None = None) -> int:
     if args.html:
         args.html.write_text(render_html_report(result))
     return 0
+
+
+def _serve_ui(host: str, port: int) -> None:
+    html = render_ui_html().encode("utf-8")
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):  # noqa: N802
+            if self.path not in {"/", "/index.html"}:
+                self.send_error(404)
+                return
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(html)))
+            self.end_headers()
+            self.wfile.write(html)
+
+        def log_message(self, format, *args):  # noqa: A003
+            return
+
+    server = ThreadingHTTPServer((host, port), Handler)
+    url = f"http://{host}:{port}"
+    print(f"Serving AgentTrace UI at {url}")
+    threading.Timer(0.5, lambda: webbrowser.open(url)).start()
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("\nStopping AgentTrace UI server.")
+    finally:
+        server.server_close()
 
 
 if __name__ == "__main__":

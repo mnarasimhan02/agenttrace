@@ -1,10 +1,19 @@
 {
   "steps": [
-    {"step_id": 1, "type": "tool", "name": "search", "tokens": 100, "status": "success"},
-    {"step_id": 2, "type": "tool", "name": "search", "tokens": 150, "status": "success"},
-    {"step_id": 3, "type": "tool", "name": "search", "tokens": 200, "status": "success"},
-    {"step_id": 4, "type": "tool", "name": "search", "tokens": 250, "status": "success"},
-    {"step_id": 5, "type": "tool", "name": "search", "tokens": 300, "status": "success"}
+    {"step_id": 1, "type": "tool", "name": "search", "tokens": 90, "status": "success"},
+    {"step_id": 2, "type": "tool", "name": "search", "tokens": 95, "status": "success"},
+    {"step_id": 3, "type": "tool", "name": "search", "tokens": 100, "status": "success"},
+    {"step_id": 4, "type": "tool", "name": "search", "tokens": 105, "status": "success"},
+    {"step_id": 5, "type": "tool", "name": "search", "tokens": 110, "status": "success"},
+    {"step_id": 6, "type": "tool", "name": "search", "tokens": 115, "status": "success"},
+    {"step_id": 7, "type": "tool", "name": "search", "tokens": 120, "status": "success"},
+    {"step_id": 8, "type": "tool", "name": "search", "tokens": 125, "status": "success"},
+    {"step_id": 9, "type": "tool", "name": "search", "tokens": 130, "status": "success"},
+    {"step_id": 10, "type": "tool", "name": "search", "tokens": 135, "status": "success"},
+    {"step_id": 11, "type": "tool", "name": "search", "tokens": 140, "status": "success"},
+    {"step_id": 12, "type": "tool", "name": "search", "tokens": 145, "status": "success"},
+    {"step_id": 13, "type": "tool", "name": "search", "tokens": 150, "status": "success"},
+    {"step_id": 14, "type": "tool", "name": "search", "tokens": 155, "status": "success"},
+    {"step_id": 15, "type": "tool", "name": "search", "tokens": 160, "status": "success"}
   ]
 }
-

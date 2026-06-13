@@ -1,8 +1,24 @@
 {
   "steps": [
-    {"step_id": 1, "type": "tool", "name": "search", "tokens": 100, "status": "success"},
-    {"step_id": 2, "type": "tool", "name": "summarize", "tokens": 120, "status": "success"},
-    {"step_id": 3, "type": "tool", "name": "answer", "tokens": 140, "status": "success"}
+    {"step_id": 1, "type": "tool", "name": "search", "tokens": 120, "status": "success"},
+    {"step_id": 2, "type": "tool", "name": "retrieve", "tokens": 135, "status": "success"},
+    {"step_id": 3, "type": "tool", "name": "summarize", "tokens": 145, "status": "success"},
+    {"step_id": 4, "type": "tool", "name": "answer", "tokens": 150, "status": "success"},
+    {"step_id": 5, "type": "tool", "name": "verify", "tokens": 160, "status": "success"},
+    {"step_id": 6, "type": "tool", "name": "search", "tokens": 165, "status": "success"},
+    {"step_id": 7, "type": "tool", "name": "retrieve", "tokens": 170, "status": "success"},
+    {"step_id": 8, "type": "tool", "name": "summarize", "tokens": 175, "status": "success"},
+    {"step_id": 9, "type": "tool", "name": "answer", "tokens": 180, "status": "success"},
+    {"step_id": 10, "type": "tool", "name": "verify", "tokens": 185, "status": "success"},
+    {"step_id": 11, "type": "tool", "name": "search", "tokens": 190, "status": "success"},
+    {"step_id": 12, "type": "tool", "name": "retrieve", "tokens": 195, "status": "success"},
+    {"step_id": 13, "type": "tool", "name": "summarize", "tokens": 200, "status": "success"},
+    {"step_id": 14, "type": "tool", "name": "answer", "tokens": 205, "status": "success"},
+    {"step_id": 15, "type": "tool", "name": "verify", "tokens": 210, "status": "success"},
+    {"step_id": 16, "type": "tool", "name": "search", "tokens": 215, "status": "success"},
+    {"step_id": 17, "type": "tool", "name": "retrieve", "tokens": 220, "status": "success"},
+    {"step_id": 18, "type": "tool", "name": "summarize", "tokens": 225, "status": "success"},
+    {"step_id": 19, "type": "tool", "name": "answer", "tokens": 230, "status": "success"},
+    {"step_id": 20, "type": "tool", "name": "verify", "tokens": 235, "status": "success"}
   ]
 }
-

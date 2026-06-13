@@ -79,9 +79,23 @@ You can also run it as a module:
 python -m agenttrace analyze trace.json
 ```
 
+To open the browser UI:
+
+```bash
+agenttrace ui --serve
+```
+
+Or generate a standalone HTML file:
+
+```bash
+agenttrace ui --output agenttrace-ui.html
+```
+
 ## Included Sample Files
 
 The repository includes sample traces in `sample_traces/` so you can try the tool immediately.
+
+The examples are intentionally sized to feel more like real traces, not just toy fixtures.
 
 ### `sample_traces/healthy.json`
 
@@ -147,6 +161,56 @@ You can also run the JSONL version:
 
 ```bash
 agenttrace analyze sample_traces/retry_storm.jsonl
+```
+
+### Larger samples
+
+If you want to try longer files right away, use these bigger examples:
+
+- `sample_traces/healthy.big.jsonl`
+- `sample_traces/looping.big.jsonl`
+
+They are still easy to read, but they better reflect the kind of input AgentTrace is meant to handle in practice.
+
+The browser UI also includes quick-load buttons for these bundled samples.
+
+## Browser UI
+
+The interactive UI lets you upload a trace directly in the browser and review the analysis in place.
+
+It includes:
+
+- file upload and drag-and-drop
+- quick sample buttons
+- reliability and waste summary cards
+- issues and recommendations panels
+- a preview of the parsed trace
+
+### Local server mode
+
+Run this when you want the UI to open on `localhost`:
+
+```bash
+agenttrace ui --serve
+```
+
+By default the server uses:
+
+- host: `127.0.0.1`
+- port: `8765`
+
+You can override them:
+
+```bash
+agenttrace ui --serve --host 0.0.0.0 --port 9000
+```
+
+### Static HTML mode
+
+If you just want a file you can keep or share locally:
+
+```bash
+agenttrace ui --output agenttrace-ui.html
 ```
 
 ## Input Format

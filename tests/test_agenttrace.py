@@ -3,8 +3,9 @@ import json
 import tempfile
 
 from agenttrace.analyzer import analyze_trace
-from agenttrace.app import load_trace
+from agenttrace.app import load_trace, main
 from agenttrace.models.trace import Trace, TraceParseError
+from agenttrace.reports.ui import render_ui_html
 
 
 def load_sample(name: str) -> Trace:
@@ -115,3 +116,21 @@ def test_load_trace_accepts_large_jsonl_trace():
         handle.flush()
         trace = load_trace(Path(handle.name))
     assert len(trace.steps) == 10_000
+
+
+def test_ui_html_contains_upload_controls():
+    html = render_ui_html()
+    assert "Drop a trace file here" in html
+    assert "Quick samples" in html
+    assert "Healthy" in html
+    assert "Reliability" in html
+
+
+def test_ui_command_writes_html_file():
+    with tempfile.NamedTemporaryFile("w+", suffix=".html", delete=True) as handle:
+        exit_code = main(["ui", "--output", handle.name])
+        handle.flush()
+        assert exit_code == 0
+        html = Path(handle.name).read_text()
+    assert "AgentTrace" in html
+    assert "Quick samples" in html

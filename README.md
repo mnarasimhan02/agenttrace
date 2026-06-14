@@ -156,41 +156,6 @@ Preview:
   - That is expected for big traces.
   - Wait for the analysis to finish before loading another file.
 
-## Release To PyPI
-
-When you are ready to publish a new version:
-
-```bash
-python3 -m pip install --upgrade build twine
-python3 -m build
-python3 -m twine check dist/*
-python3 -m twine upload dist/*
-```
-
-### Before you publish
-
-Make sure:
-
-- the version in `setup.py` has been updated
-- the README reflects the current UI and sample files
-- the package runs correctly on a clean install
-- the GitHub repo is tagged if you want a release marker
-
-### First release
-
-For a first public release, it helps to:
-
-- test the install in a fresh virtual environment
-- verify `agenttrace analyze trace.json --html report.html`
-- verify `agenttrace ui --serve`
-- confirm the PyPI name is available before uploading
-
-After that, publishing future releases is usually just:
-
-1. bump the version
-2. build the package
-3. upload to PyPI
-
 ## Input Format
 
 AgentTrace expects a JSON object with a `steps` array.

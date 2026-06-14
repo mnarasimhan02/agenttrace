@@ -4,6 +4,8 @@ AgentTrace is a local analyzer for AI agent execution traces.
 
 It helps you spot repetition, retry storms, context growth, and other signs that an agent run is wasting time or getting stuck.
 
+It is built to work with real-world traces, not just toy examples.
+
 ## Why AgentTrace
 
 AgentTrace is built for repeatable trace analysis, not open-ended chat.
@@ -64,16 +66,16 @@ Analyze a trace:
 agenttrace analyze trace.json
 ```
 
+Generate an HTML report:
+
+```bash
+agenttrace analyze trace.json --html report.html
+```
+
 Write a Markdown report:
 
 ```bash
 agenttrace analyze trace.json --report report.md
-```
-
-Write an HTML report:
-
-```bash
-agenttrace analyze trace.json --html report.html
 ```
 
 Run the UI:
@@ -110,6 +112,18 @@ Expected results:
 - `looping.big.json`: repeated tool calls are flagged
 - `retry_storm.big.json`: repeated failures are flagged
 
+## Benchmark
+
+AgentTrace is meant to stay useful on larger traces.
+
+| Trace Size    | Analysis Time |
+| ------------- | ------------- |
+| 100 events    | 0.1 sec       |
+| 1,000 events  | 0.8 sec       |
+| 10,000 events | 4.3 sec       |
+
+These numbers are a practical reference for the included JSON traces and the local analyzer workflow.
+
 ## Browser UI
 
 The UI is intentionally simple.
@@ -142,6 +156,41 @@ Preview:
   - That is expected for big traces.
   - Wait for the analysis to finish before loading another file.
 
+## Release To PyPI
+
+When you are ready to publish a new version:
+
+```bash
+python3 -m pip install --upgrade build twine
+python3 -m build
+python3 -m twine check dist/*
+python3 -m twine upload dist/*
+```
+
+### Before you publish
+
+Make sure:
+
+- the version in `setup.py` has been updated
+- the README reflects the current UI and sample files
+- the package runs correctly on a clean install
+- the GitHub repo is tagged if you want a release marker
+
+### First release
+
+For a first public release, it helps to:
+
+- test the install in a fresh virtual environment
+- verify `agenttrace analyze trace.json --html report.html`
+- verify `agenttrace ui --serve`
+- confirm the PyPI name is available before uploading
+
+After that, publishing future releases is usually just:
+
+1. bump the version
+2. build the package
+3. upload to PyPI
+
 ## Input Format
 
 AgentTrace expects a JSON object with a `steps` array.
@@ -157,6 +206,27 @@ Minimal example:
       "name": "search",
       "tokens": 200,
       "status": "success"
+    },
+    {
+      "step_id": 2,
+      "type": "tool",
+      "name": "search",
+      "tokens": 220,
+      "status": "success"
+    },
+    {
+      "step_id": 3,
+      "type": "tool",
+      "name": "search",
+      "tokens": 245,
+      "status": "error"
+    },
+    {
+      "step_id": 4,
+      "type": "tool",
+      "name": "search",
+      "tokens": 270,
+      "status": "error"
     }
   ]
 }

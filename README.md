@@ -2,19 +2,38 @@
 
 AgentTrace is a local analyzer for AI agent execution traces.
 
-It helps you spot repetition, retry storms, context growth, and other signs that an agent run is wasting time or getting stuck.
+It helps builders understand what an agent is doing when a run gets slow, repetitive, or expensive.
 
-It is built to work with real-world traces, not just toy examples.
+## Why It Exists
 
-## Why AgentTrace
+AI agents are easy to launch and hard to debug.
+
+The trace often shows the problem clearly:
+
+- the same tool gets called again and again
+- retries keep failing
+- context grows faster than the task does
+- tokens are spent without forward progress
+
+AgentTrace turns those patterns into a simple report and browser view, without needing an LLM in the loop.
+
+## What It Finds
+
+- repeated tool calls
+- retry storms
+- context growth
+- estimated token waste
+- reliability risk
+
+## Why Not Just Use an LLM?
 
 AgentTrace is built for repeatable trace analysis, not open-ended chat.
 
 - It runs locally and gives the same result for the same trace.
-- It focuses on specific failure patterns such as repetition, retry storms, and context growth.
+- It focuses on specific failure patterns.
 - It produces a structured report and UI that are easy to scan, compare, and share.
 
-Use an LLM when you want:
+An LLM is still useful when you want:
 
 - a narrative explanation
 - flexible reasoning over unusual cases
@@ -36,7 +55,7 @@ agenttrace ui --serve
 
 Then open the local link that appears in your browser or terminal.
 
-## Installation
+## Install
 
 ### From source
 
@@ -58,7 +77,7 @@ python3 -m pip install --no-build-isolation -e /path/to/agenttrace
 - No API keys
 - No network access required after installation
 
-## Usage
+## Use It
 
 Analyze a trace:
 
@@ -72,19 +91,19 @@ Generate an HTML report:
 agenttrace analyze trace.json --html report.html
 ```
 
-Write a Markdown report:
+Generate a Markdown report:
 
 ```bash
 agenttrace analyze trace.json --report report.md
 ```
 
-Run the UI:
+Run the browser UI:
 
 ```bash
 agenttrace ui --serve
 ```
 
-Or generate a standalone HTML file:
+Or write a standalone HTML file:
 
 ```bash
 agenttrace ui --output outputs/agenttrace-ui.html
@@ -92,13 +111,13 @@ agenttrace ui --output outputs/agenttrace-ui.html
 
 ## Sample Files
 
-The repository includes three larger sample traces in `sample_traces/`:
+The repo includes larger sample traces in `sample_traces/`:
 
 - `sample_traces/healthy.big.json`
 - `sample_traces/looping.big.json`
 - `sample_traces/retry_storm.big.json`
 
-Use them to verify the main detection paths:
+Use them to test the main analysis paths:
 
 ```bash
 agenttrace analyze sample_traces/healthy.big.json
@@ -122,7 +141,7 @@ AgentTrace is meant to stay useful on larger traces.
 | 1,000 events  | 0.8 sec       |
 | 10,000 events | 4.3 sec       |
 
-These numbers are a practical reference for the included JSON traces and the local analyzer workflow.
+These numbers are a practical reference for local trace analysis.
 
 ## Browser UI
 
@@ -136,25 +155,9 @@ It includes:
 - issues and recommendations
 - a preview of the parsed trace
 
-Open the generated page in your browser, then upload a trace or use one of the sample files.
-
 Preview:
 
 ![AgentTrace UI preview](/Users/mnarasimhan/Documents/Codex/2026-06-12/files-mentioned-by-the-user-agenttrace/outputs/agenttrace-ui-preview.png)
-
-## Troubleshooting
-
-- `command not found: agenttrace`
-  - Re-run the install command from inside the repo folder.
-  - If needed, use `python3 -m agenttrace ...` instead.
-- `pip` tries to build extra tools
-  - Keep `--no-build-isolation` in the install command.
-- The UI looks blank
-  - Reload the page and try a bundled sample file.
-  - Make sure you are uploading a `.json` trace.
-- Large files take time
-  - That is expected for big traces.
-  - Wait for the analysis to finish before loading another file.
 
 ## Input Format
 
@@ -196,3 +199,17 @@ Minimal example:
   ]
 }
 ```
+
+## Troubleshooting
+
+- `command not found: agenttrace`
+  - Re-run the install command from inside the repo folder.
+  - If needed, use `python3 -m agenttrace ...` instead.
+- `pip` tries to build extra tools
+  - Keep `--no-build-isolation` in the install command.
+- The UI looks blank
+  - Reload the page and try a bundled sample file.
+  - Make sure you are uploading a `.json` trace.
+- Large files take time
+  - That is expected for big traces.
+  - Wait for the analysis to finish before loading another file.
